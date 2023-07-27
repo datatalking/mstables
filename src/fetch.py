@@ -291,23 +291,24 @@ def fetch(db_file):
 
         # Fetch data from API's using multiprocessing.Pool
         results = []
-        while True:
-            try:
-                with mp.Pool(pool_size) as p:
-                    #r = p.imap_unordered(fetch_api, items)
-                    #r = p.map(fetch_api, items)
-                    r = p.imap(fetch_api, items)
-                    for turn in range(len(items)):
-                        try:
-                            results.append(r.next(timeout=5))
-                        except mp.context.TimeoutError:
-                            pass
-                break
-            except KeyboardInterrupt:
-                print('\nGoodbye!')
-                exit()
-            except:
-                raise
+        try:
+            with mp.Pool(pool_size) as p:
+                # Use .map() instead of .imap() for better stability
+                r = p.map_async(fetch_api, items)
+                try:
+                    results = r.get(timeout=60)  # Increased timeout
+                except mp.TimeoutError:
+                    p.terminate()
+                    print("Pool timed out")
+        except KeyboardInterrupt:
+            print('\nGoodbye!')
+            exit()
+        except Exception as e:
+            print(f"Pool error: {e}")
+            raise
+
+        # Filter None results after pool completes
+        results = [r for r in results if r is not None]
 
         # Fetch data from API's without multiprocessing.Pool
         '''for item in url_info:
@@ -373,7 +374,12 @@ def fetch_api(url_info):
     t0 = time.time()
 
     # Unpack variables
-    url_id, url, ticker_id, exch_id = url_info
+    try:
+        url_id, url, ticker_id, exch_id = url_info
+    except (IndexError, ValueError) as e:
+        print(f"Error unpacking url_info: {e}")
+        return None
+
     num = ticker_list[url_id]['{}:{}'.format(exch_id, ticker_id)]
     ct = ticker_count[url_id]
     print_progress(url_id, num, ct)
