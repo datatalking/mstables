@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 from shutil import copyfile
-from datetime import datetime
 from importlib import reload
-import fetch, time, os, re, sqlite3
+import time, os, re
+from src import fetch
 
 __author__ = "Caio Brandao"
 __copyright__ = "Copyright 2019+, Caio Brandao"
