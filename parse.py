@@ -1,10 +1,9 @@
 from bs4 import BeautifulSoup as bs
-from importlib import reload #Comment out once done using
 import datetime as DT
 from io import StringIO
 import pandas as pd
-import numpy as np
-import fetch, sqlite3, time, json, zlib, csv, sys, re
+import sqlite3, time, json, zlib, re
+from src import fetch
 
 
 # Manage database connection and fetch data to be parsed
@@ -277,7 +276,7 @@ def parse_2(cur, ticker_id, exch_id, data):
     # Update Tickers table with parsed data
     sql = fetch.sql_update_record('Master', {'industry_id':industry_id,
         'stock_type_id':stype_id, 'fyend_id':fyend_id, 'style_id':style_id},
-        {'ticker_id':ticker_id, 'exchange_id':exch_id})
+                                  {'ticker_id':ticker_id, 'exchange_id':exch_id})
     fetch.db_execute(cur, sql)
 
     return 200
@@ -831,7 +830,7 @@ def parse_9(cur, ticker_id, exch_id, data):
                 info['ticker_id'] = ticker_id
                 info['exchange_id'] = exch_id
                 sql = fetch.sql_insert('InsiderTransactions',
-                    tuple(info.keys()), tuple(info.values()))
+                                       tuple(info.keys()), tuple(info.values()))
                 fetch.db_execute(cur, sql)
 
     return 200

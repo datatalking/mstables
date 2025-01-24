@@ -9,7 +9,7 @@ import os
 
 class DataFrames():
 
-    db_file = 'db/mstables.sqlite' # Standard db file name
+    db_file = 'data/mstables.sqlite'  # Standard db file name
 
     def __init__(self, file = db_file):
 
