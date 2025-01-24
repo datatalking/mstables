@@ -1,0 +1,15 @@
+zlib~=1.2.13
+fetch
+time
+os
+re
+numpy
+requests
+pandas
+sqlite3
+sqlalchemy
+requests
+json
+zlib
+parse
+bs4

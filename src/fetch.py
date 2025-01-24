@@ -100,17 +100,17 @@ def create_tables(db_file):
     # Insert list of countries into Countries table
     sql = '''INSERT OR IGNORE INTO Countries
         (country, a2_iso, a3_un) VALUES (?, ?, ?)'''
-    cur.executemany(sql, csv_content('input/ctycodes.csv', 3))
+    cur.executemany(sql, csv_content('../input/ctycodes.csv', 3))
 
     # Insert list of currencies into Currencies table
     sql = '''INSERT OR IGNORE INTO Currencies (currency, currency_code)
         VALUES (?, ?)'''
-    cur.executemany(sql, csv_content('input/symbols.csv', 2))
+    cur.executemany(sql, csv_content('../input/symbols.csv', 2))
 
     # Insert list of types into SecurityTypes table
     sql = '''INSERT OR IGNORE INTO SecurityTypes
         (security_type_code, security_type) VALUES (?, ?)'''
-    cur.executemany(sql, csv_content('input/ms_investment-types.csv', 2))
+    cur.executemany(sql, csv_content('../input/ms_investment-types.csv', 2))
 
     # Insert list of api URLs into URLs table
     for k, v in apis.items():
