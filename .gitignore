@@ -159,6 +159,13 @@ config/fleet_config.json
 config/machine_config.json
 config/data_paths.json
 
+# Archive directories
+archive/
+mstables_002/
+notebooks_TODO/
+non_working_code_py/
+Crypto_Statistical_Analysis/
+
 # Log files
 logs/
 *.log
