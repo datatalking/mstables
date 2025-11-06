@@ -157,3 +157,24 @@ Simons Strategery/
 data/
 config/fleet_config.json
 config/machine_config.json
+config/data_paths.json
+
+# Log files
+logs/
+*.log
+
+# Results and outputs
+data/results/
+*.png
+*.json
+*.csv
+!requirements.txt
+!pyproject.toml
+!package.json
+!package-lock.json
+
+# Temporary files
+*.zip
+*.pth
+*.pkl
+*.pickle
