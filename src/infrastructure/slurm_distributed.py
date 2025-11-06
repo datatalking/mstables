@@ -102,63 +102,33 @@ class SLURMDistributedScheduler:
     def _load_machine_config(self) -> Dict[str, MachineResource]:
         """Load machine configuration from fleet config"""
         machines = {}
+        default_machines = {}
         
-        # Default machines from mstables network setup
-        default_machines = {
-            '5,1': {
-                'hostname': 'macpro.lan',
-                'ip': '192.168.86.144',
-                'cpus': 8,
-                'memory_gb': 64,
-                'gpu_available': True,
-                'ssh_user': 'owner',
-                'description': 'Mac Pro 5,1 with 64GB RAM, 2x4TB WD drives, GTX 6GB GPU'
-            },
-            '6,1': {
-                'hostname': 'corns-mac-pro.lan',
-                'ip': '192.168.86.133',
-                'cpus': 12,
-                'memory_gb': 32,
-                'gpu_available': False,
-                'ssh_user': 'owner',
-                'description': 'Mac Pro 6,1 "trashcan"'
-            },
-            '7,1': {
-                'hostname': 'mac-pro.lan',
-                'ip': '192.168.86.143',
-                'cpus': 32,
-                'memory_gb': 192,
-                'gpu_available': True,
-                'ssh_user': 'xavier',
-                'description': 'Mac Pro 7,1 (xavier)'
-            },
-            'macmini': {
-                'hostname': 'corns-mac-pro-2.lan',
-                'ip': '192.168.86.132',
-                'cpus': 8,
-                'memory_gb': 16,
-                'gpu_available': False,
-                'ssh_user': 'owner',
-                'description': 'Mac mini'
-            }
-        }
-        
-        # Try to load from config file
+        # Load from config file (required - no hardcoded defaults for security)
         if self.config_path.exists():
             try:
                 with open(self.config_path, 'r') as f:
                     config = json.load(f)
                     if 'machines' in config:
-                        default_machines.update(config['machines'])
+                        default_machines = config['machines']
+                    else:
+                        logger.warning(f"No 'machines' key found in config file: {self.config_path}")
             except Exception as e:
-                logger.warning(f"Could not load config file: {e}")
+                logger.error(f"Could not load config file {self.config_path}: {e}")
+                logger.info(f"Copy config/fleet_config.json.template to {self.config_path} and configure your machines")
+                return machines
+        else:
+            logger.warning(f"Config file not found: {self.config_path}")
+            logger.info(f"Copy config/fleet_config.json.template to {self.config_path} and configure your machines")
+            return machines
         
         # Convert to MachineResource objects
         for machine_id, machine_info in default_machines.items():
             # Check machine status
+            ssh_user = machine_info.get('ssh_user', os.getenv('USER', 'user'))
             status = self._check_machine_status(
                 machine_info['ip'],
-                machine_info.get('ssh_user', 'xavier')
+                ssh_user
             )
             
             machines[machine_id] = MachineResource(
@@ -169,7 +139,7 @@ class SLURMDistributedScheduler:
                 gpu_available=machine_info.get('gpu_available', False),
                 status=status,
                 current_jobs=0,
-                ssh_user=machine_info.get('ssh_user', 'xavier'),
+                ssh_user=machine_info.get('ssh_user', os.getenv('USER', 'user')),
                 ssh_key_path=machine_info.get('ssh_key_path')
             )
         

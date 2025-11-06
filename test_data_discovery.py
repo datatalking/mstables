@@ -43,49 +43,23 @@ class DataDiscoveryTester:
         self.env_file_path = env_file_path
         self.env_data = {}
         
-        # Updated machine mappings based on network discovery
-        self.network_devices = {
-            '5,1': {
-                'name': 'JaneLaptop',
-                'hostname': 'macpro.lan',
-                'ip': '192.168.86.144',
-                'mac': '6e:6a:87:3d:33:6',
-                'description': 'Mac Pro 5,1 with 64GB RAM, 2x4TB WD drives, GTX 6GB GPU',
-                'usernames': ['owner', 'Owner', 'jane']
-            },
-            '6,1': {
-                'name': "Corn's Mac Pro",
-                'hostname': 'corns-mac-pro.lan',
-                'ip': '192.168.86.133',
-                'mac': '6c:19:c0:e7:68:de',
-                'description': 'Mac Pro 6,1 "trashcan"',
-                'usernames': ['owner', 'Owner', 'corn']
-            },
-            '7,1': {
-                'name': 'mac-pro (Current)',
-                'hostname': 'mac-pro.lan',
-                'ip': '192.168.86.143',
-                'mac': 'e4:50:eb:b9:fa:e2',
-                'description': 'Mac Pro 7,1 (xavier)',
-                'usernames': ['xavier']
-            },
-            'macmini': {
-                'name': "Corn's Mac Pro (2)",
-                'hostname': 'corns-mac-pro-2.lan',
-                'ip': '192.168.86.132',
-                'mac': '6c:ab:31:f1:b5:34',
-                'description': 'Mac mini',
-                'usernames': ['owner', 'Owner', 'corn']
-            },
-            'gateway': {
-                'name': 'Che Computer',
-                'hostname': 'gateway',
-                'ip': '192.168.86.1',
-                'mac': '90:ca:fa:6f:c2:84',
-                'description': '2TB AirPort Extreme/Time Capsule',
-                'usernames': []
-            }
-        }
+        # Load machine mappings from config file (required - no hardcoded defaults for security)
+        self.network_devices = {}
+        config_path = Path('config/machine_config.json')
+        if config_path.exists():
+            try:
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                    if 'network_devices' in config:
+                        self.network_devices = config['network_devices']
+                    else:
+                        logger.warning(f"No 'network_devices' key found in config file: {config_path}")
+            except Exception as e:
+                logger.error(f"Could not load config file {config_path}: {e}")
+                logger.info(f"Copy config/machine_config.json.template to {config_path} and configure your machines")
+        else:
+            logger.warning(f"Config file not found: {config_path}")
+            logger.info(f"Copy config/machine_config.json.template to {config_path} and configure your machines")
         
         self.results = {
             'local_paths': {},
@@ -260,14 +234,18 @@ class DataDiscoveryTester:
         try:
             # For each data path, check if it exists on the remote machine
             for path in data_paths:
-                if 'OWNER' in path or 'owner' in path:
+                # Check path for username patterns (abstracted)
+                if any(pattern in path for pattern in ['/Users/', '/USERS/']):
                     # Try to check path existence via SSH
-                    for username in device_info['usernames']:
+                    for username in device_info.get('usernames', []):
                         try:
-                            # Construct remote path
-                            if path.startswith('/USERS/OWNER/'):
+                            # Construct remote path (abstracted pattern matching)
+                            if '/USERS/' in path.upper():
+                                # Replace generic /USERS/OWNER/ pattern with actual username
                                 remote_path = path.replace('/USERS/OWNER/', f'/Users/{username}/')
-                            elif path.startswith('/Users/owner/'):
+                                remote_path = remote_path.replace('/USERS/owner/', f'/Users/{username}/')
+                            elif path.startswith('/Users/'):
+                                # Replace generic /Users/owner/ pattern with actual username
                                 remote_path = path.replace('/Users/owner/', f'/Users/{username}/')
                             else:
                                 remote_path = path
@@ -383,16 +361,26 @@ class DataDiscoveryTester:
         }
         
         try:
-            # Check common PycharmProjects locations
+            # Check common PycharmProjects locations (abstracted)
+            # Load from config or environment variables instead of hardcoding
             possible_paths = [
-                '/Users/owner/PycharmProjects/Global-Finance',
-                '/Users/vanessa/PycharmProjects/Global-Finance',
-                '/Users/scottfarkis/PycharmProjects/Global-Finance',
-                '/Users/wadewilson/PycharmProjects/Global-Finance',
-                '/Users/janelaptop/PycharmProjects/Global-Finance',
-                '/Users/xavier/PycharmProjects/Global-Finance',
-                os.path.expanduser('~/PycharmProjects/Global-Finance')
+                os.path.expanduser('~/PycharmProjects/Global-Finance'),
+                os.path.expanduser('~/Projects/Global-Finance'),
+                os.path.expanduser('~/Documents/Global-Finance')
             ]
+            
+            # Add paths from config if available
+            config_path = Path('config/data_paths.json')
+            if config_path.exists():
+                try:
+                    with open(config_path, 'r') as f:
+                        config = json.load(f)
+                        if 'machine_path_mappings' in config:
+                            for machine_id, mapping in config['machine_path_mappings'].items():
+                                if 'base_paths' in mapping:
+                                    possible_paths.extend(mapping['base_paths'])
+                except Exception as e:
+                    logger.warning(f"Could not load path mappings: {e}")
             
             for path in possible_paths:
                 if os.path.exists(path):

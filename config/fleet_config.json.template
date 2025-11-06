@@ -1,0 +1,24 @@
+{
+  "machines": {
+    "machine_1": {
+      "hostname": "machine-1.local",
+      "ip": "192.168.1.100",
+      "cpus": 8,
+      "memory_gb": 64,
+      "gpu_available": true,
+      "ssh_user": "username",
+      "ssh_key_path": "/path/to/ssh/key",
+      "description": "Machine 1 description"
+    },
+    "machine_2": {
+      "hostname": "machine-2.local",
+      "ip": "192.168.1.101",
+      "cpus": 32,
+      "memory_gb": 192,
+      "gpu_available": true,
+      "ssh_user": "username",
+      "description": "Machine 2 description"
+    }
+  }
+}
+

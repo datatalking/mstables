@@ -1,0 +1,18 @@
+{
+  "paths": [
+    "/path/to/financial/data",
+    "/path/to/stock/data",
+    "/path/to/commodities/data",
+    "~/Documents/Financial_Data"
+  ],
+  "machine_path_mappings": {
+    "machine_1": {
+      "username": "username",
+      "base_paths": [
+        "/Users/username/Data/Financial_Data",
+        "/Users/username/Data/Stocks"
+      ]
+    }
+  }
+}
+

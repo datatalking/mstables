@@ -44,7 +44,8 @@ class TestNetworkDiscovery:
         assert len(devices) > 0
         
         # Check for known devices
-        assert '5,1' in devices or '7,1' in devices or 'macmini' in devices
+        # Test with generic machine identifiers
+        assert 'machine_1' in devices or 'machine_2' in devices or 'test_machine' in devices
     
     def test_hostname_resolution(self):
         """Test hostname resolution"""
@@ -75,8 +76,8 @@ class TestDistributedDataAccess:
     
     def test_machine_id_extraction(self):
         """Test extracting machine ID from paths"""
-        # Test path format: /Users/owner/Data_Jane🤑/Financial_Data
-        path = "/Users/owner/Data_Jane🤑/Financial_Data"
+        # Test path format: /Users/username/Data/Financial_Data
+        path = "/Users/username/Data/Financial_Data"
         
         # Extract username from path
         parts = path.split('/')
@@ -96,7 +97,7 @@ class TestDistributedDataAccess:
         manager = DataPathManager()
         
         # Test getting paths by machine
-        paths = manager.get_paths_by_machine('5,1')
+        paths = manager.get_paths_by_machine('machine_1')
         
         assert paths is not None
         assert isinstance(paths, list)

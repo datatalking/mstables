@@ -61,7 +61,8 @@ class TestSLURMScheduler:
         scheduler = SLURMDistributedScheduler(config_path=temp_config)
         
         # Check default machines loaded
-        assert '5,1' in scheduler.machines or '7,1' in scheduler.machines or 'test_machine' in scheduler.machines
+        # Test with generic machine identifiers
+        assert 'test_machine' in scheduler.machines or 'machine_1' in scheduler.machines
     
     def test_partition_configuration(self, temp_config):
         """Test partition configuration"""

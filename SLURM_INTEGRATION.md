@@ -170,26 +170,30 @@ Create `config/fleet_config.json`:
 ```json
 {
   "machines": {
-    "5,1": {
-      "hostname": "macpro.lan",
-      "ip": "192.168.86.144",
+    "machine_1": {
+      "hostname": "machine-1.local",
+      "ip": "192.168.1.100",
       "cpus": 8,
       "memory_gb": 64,
       "gpu_available": true,
-      "ssh_user": "owner",
-      "ssh_key_path": "/path/to/ssh/key"
+      "ssh_user": "username",
+      "ssh_key_path": "/path/to/ssh/key",
+      "description": "Machine 1 description"
     },
-    "7,1": {
-      "hostname": "mac-pro.lan",
-      "ip": "192.168.86.143",
+    "machine_2": {
+      "hostname": "machine-2.local",
+      "ip": "192.168.1.101",
       "cpus": 32,
       "memory_gb": 192,
       "gpu_available": true,
-      "ssh_user": "xavier"
+      "ssh_user": "username",
+      "description": "Machine 2 description"
     }
   }
 }
 ```
+
+**Note**: Copy `config/fleet_config.json.template` to `config/fleet_config.json` and update with your actual machine information. The config file is excluded from git for security.
 
 ### SLURM Script Template
 

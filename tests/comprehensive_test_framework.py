@@ -375,7 +375,9 @@ class ComprehensiveTestFramework:
             
             # Test network device discovery
             machines = []
-            for ip in ['192.168.86.144', '192.168.86.133', '192.168.86.143', '192.168.86.132']:
+            # Test with placeholder IPs (actual IPs should come from config)
+            test_ips = ['127.0.0.1', '192.168.1.100', '192.168.1.101', '192.168.1.102']
+            for ip in test_ips:
                 try:
                     result = subprocess.run(
                         ['ping', '-c', '1', '-W', '1', ip],

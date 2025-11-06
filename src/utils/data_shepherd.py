@@ -1227,11 +1227,9 @@ def main():
     
     # Import commodity data
     commodity_files = [
-        ('/Users/xavier/sbox/Financial_Data/Commodities/A.CRE-Ai1-UW-v0.87.xlsb', 'agricultural'),
-        ('/Users/xavier/sbox/Financial_Data/Commodities/Commodity1 Month Change12 Month ChangeYear to Date.csv', 'general'),
-        ('/Users/xavier/sbox/Financial_Data/Commodities/FOSS_landings.csv', 'fisheries'),
-        ('/Users/xavier/sbox/Financial_Data/Commodities/HogsCostReturn.xlsx', 'livestock'),
-        ('/Users/xavier/sbox/Financial_Data/Commodities/Alaska Salmon Fishery Wholesale Prices, 2000 - 2013.xlsx', 'fisheries')
+        # Commodity file paths - use environment variables or config for actual paths
+        # Example: (os.getenv('COMMODITIES_PATH', '/path/to/commodities') + '/file.xlsb', 'agricultural')
+        # Replace with your actual commodity data paths
     ]
     
     for file_path, commodity_type in commodity_files:

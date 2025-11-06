@@ -28,74 +28,45 @@ class DataPathPopulator:
         self.db_path = db_path
         self.init_table()
         
-        # Network devices discovered from test
-        self.network_devices = {
-            '5,1': {
-                'name': 'JaneLaptop',
-                'hostname': 'macpro.lan',
-                'ip': '192.168.86.144',
-                'mac': '6e:6a:87:3d:33:6',
-                'description': 'Mac Pro 5,1 with 64GB RAM, 2x4TB WD drives, GTX 6GB GPU',
-                'usernames': ['owner', 'Owner', 'jane']
-            },
-            '6,1': {
-                'name': "Corn's Mac Pro",
-                'hostname': 'corns-mac-pro.lan',
-                'ip': '192.168.86.133',
-                'mac': '6c:19:c0:e7:68:de',
-                'description': 'Mac Pro 6,1 "trashcan"',
-                'usernames': ['owner', 'Owner', 'corn']
-            },
-            '7,1': {
-                'name': 'mac-pro (Current)',
-                'hostname': 'mac-pro.lan',
-                'ip': '192.168.86.143',
-                'mac': 'e4:50:eb:b9:fa:e2',
-                'description': 'Mac Pro 7,1 (xavier)',
-                'usernames': ['xavier']
-            },
-            'macmini': {
-                'name': "Corn's Mac Pro (2)",
-                'hostname': 'corns-mac-pro-2.lan',
-                'ip': '192.168.86.132',
-                'mac': '6c:ab:31:f1:b5:34',
-                'description': 'Mac mini',
-                'usernames': ['owner', 'Owner', 'corn']
-            },
-            'gateway': {
-                'name': 'Che Computer',
-                'hostname': 'gateway',
-                'ip': '192.168.86.1',
-                'mac': '90:ca:fa:6f:c2:84',
-                'description': '2TB AirPort Extreme/Time Capsule',
-                'usernames': []
-            }
-        }
+        # Load network devices from config file (required - no hardcoded defaults for security)
+        self.network_devices = {}
+        config_path = Path('config/machine_config.json')
+        if config_path.exists():
+            try:
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                    if 'network_devices' in config:
+                        self.network_devices = config['network_devices']
+                    else:
+                        logger.warning(f"No 'network_devices' key found in config file: {config_path}")
+            except Exception as e:
+                logger.error(f"Could not load config file {config_path}: {e}")
+                logger.info(f"Copy config/machine_config.json.template to {config_path} and configure your machines")
+        else:
+            logger.warning(f"Config file not found: {config_path}")
+            logger.info(f"Copy config/machine_config.json.template to {config_path} and configure your machines")
         
-        # Paths discovered from test results
-        self.discovered_paths = [
-            '~/USERS/WADEWILSON/LIBRARY/MOBILE DOCUMENTS/COM~APPLE~CLOUDDOCS/DATA/FINANCIAL/YAHOO_SP500/',
-            'SP500_SCRAPE_PATH',
-            '/Users/owner/Data_Jane🤑/Financial_Data',
-            '~/USERS/OWNER/SBOX/PYCHARMPROJECTS/GLOBAL-FINANCE/DATA/',
-            'DATA_JANE_PATH',
-            'YAHOO_FINANCE_PATH',
-            '/USERS/OWNER/DATA_JANE🤑',
-            'FINANCIAL_DATA_PATH',
-            '/USERS/OWNER/DATA_JANE🤑/FINANCIAL_DATA',
-            '/YAHOO_FINANCE_SP500_SCRAPE',
-            '/USERS/OWNER/SBOX/DATA_DIRTY/YA_ASSETS',
-            '/Users/owner/sbox/PycharmProjects/yahoo_finance_Sp500_scrape',
-            '/USERS/OWNER/DATA_JANE🤑/MSTABLES_2019_2022',
-            'MSTABLES_PATH',
-            'YAHOO_SCRAPE_TEST_PATH',
-            '/YAHOO_FINANCE_SP500_SCRAPE/TEST',
-            'CSV_SAVE_PATH',
-            '/Users/owner/sbox/data_dirty/ya_assets',
-            '/USERS/OWNER/DATA_JANE🤑/STOCKS',
-            'STOCKS_PATH',
-            '/USERS/OWNER/SBOX/DATA_DIRTY/YA_ASSETS/STOCK_DFS/'
-        ]
+        # Paths should be loaded from environment variables or config file
+        # Load paths from .env or config file instead of hardcoding
+        self.discovered_paths = []
+        env_paths = os.getenv('FINANCIAL_DATA_PATHS', '')
+        if env_paths:
+            try:
+                self.discovered_paths = json.loads(env_paths) if env_paths.startswith('[') else env_paths.split(',')
+            except:
+                self.discovered_paths = [p.strip() for p in env_paths.split(',') if p.strip()]
+        
+        # If no paths from env, load from config file
+        if not self.discovered_paths:
+            config_path = Path('config/data_paths.json')
+            if config_path.exists():
+                try:
+                    with open(config_path, 'r') as f:
+                        config = json.load(f)
+                        if 'paths' in config:
+                            self.discovered_paths = config['paths']
+                except Exception as e:
+                    logger.warning(f"Could not load data paths config: {e}")
     
     def init_table(self):
         """Initialize the financial_data_paths table."""

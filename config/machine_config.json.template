@@ -1,0 +1,29 @@
+{
+  "network_devices": {
+    "machine_1": {
+      "name": "Machine 1",
+      "hostname": "machine-1.local",
+      "ip": "192.168.1.100",
+      "mac": "00:00:00:00:00:01",
+      "description": "Machine 1 description",
+      "usernames": ["username1", "username2"]
+    },
+    "machine_2": {
+      "name": "Machine 2",
+      "hostname": "machine-2.local",
+      "ip": "192.168.1.101",
+      "mac": "00:00:00:00:00:02",
+      "description": "Machine 2 description",
+      "usernames": ["username"]
+    },
+    "gateway": {
+      "name": "Gateway",
+      "hostname": "gateway.local",
+      "ip": "192.168.1.1",
+      "mac": "00:00:00:00:00:00",
+      "description": "Network gateway/router",
+      "usernames": []
+    }
+  }
+}
+
